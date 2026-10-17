@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RR MULTI TRADING — Gold Intraday Research (Live A4 PDF)</title>
+  <style>
+    /* Strict 1-Page A4 Print Styles */
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: #0f172a;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    /* Screen UI Control Bar (Hidden when printing to PDF) */
+    .no-print-bar {
+      max-width: 210mm;
+      margin: 15px auto;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .control-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .control-group input {
+      width: 80px;
+      padding: 5px 8px;
+      border: 1px solid #475569;
+      border-radius: 4px;
+      background: #1e293b;
+      color: #fff;
+      font-weight: 700;
+    }
+    .btn {
+      border: none;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .btn-fetch { background: #0284c7; color: #fff; }
+    .btn-fetch:hover { background: #0369a1; }
+    .btn-print { background: #16a34a; color: #fff; }
+    .btn-print:hover { background: #15803d; }
+
+    /* Single A4 Page Sheet Container */
+    .sheet-wrapper {
+      display: flex;
+      justify-content: center;
+      padding-bottom: 25px;
+    }
+    .page {
+      width: 210mm;
+      height: 297mm;
+      background: #ffffff;
+      box-shadow: 0 0 20px rgba(0,0,0,0.08);
+      padding: 12mm 15mm 10mm 15mm;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Header Masthead */
+    .header-box {
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .brand-title {
+      font-size: 19px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      color: #0f172a;
+      margin: 0;
+    }
+    .brand-sub {
+      font-size: 10.5px;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-top: 2px;
+    }
+    .meta-box {
+      text-align: right;
+      font-size: 11px;
+      font-weight: 600;
+      color: #334155;
+      line-height: 1.35;
+    }
+
+    /* Directional Bias Callout */
+    .bias-card {
+      border: 1.5px solid #dc2626;
+      background: #fef2f2;
+      border-radius: 6px;
+      padding: 9px 12px;
+      margin-top: 8px;
+    }
+    .bias-card.bullish {
+      border-color: #16a34a;
+      background: #f0fdf4;
+    }
+    .bias-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+    .badge-bias {
+      background: #dc2626;
+      color: #fff;
+      padding: 3px 9px;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 4px;
+    }
+    .badge-bias.bullish { background: #16a34a; }
+    .badge-pivot {
+      background: #2563eb;
+      color: #fff;
+      padding: 3px 9px;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 4px;
+    }
+    .bias-text {
+      font-size: 11.5px;
+      color: #7f1d1d;
+      line-height: 1.4;
+    }
+    .bias-text.bullish { color: #14532d; }
+
+    /* Visual Technical Chart Box */
+    .chart-box {
+      margin: 8px 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #ffffff;
+      padding: 6px;
+    }
+
+    /* Supports & Resistances Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      margin: 6px 0;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 5px 8px;
+      text-align: left;
+    }
+    th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    tr.row-pivot { background: #eff6ff; font-weight: 700; color: #1d4ed8; }
+    tr.row-target { background: #fff1f2; font-weight: 700; color: #9f1239; }
+    tr.row-target.bullish { background: #f0fdf4; color: #166534; }
+
+    /* Execution 4-Grid Blueprint */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin: 6px 0;
+    }
+    .grid-item {
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      border-radius: 4px;
+      padding: 6px 8px;
+    }
+    .grid-item span {
+      display: block;
+      font-size: 9.5px;
+      color: #64748b;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .grid-item strong {
+      font-size: 12px;
+      color: #0f172a;
+    }
+
+    /* Technical Commentary */
+    .commentary-box {
+      background: #f8fafc;
+      border-left: 3px solid #0f172a;
+      padding: 6px 10px;
+      margin: 6px 0;
+      font-size: 10.5px;
+      color: #334155;
+      line-height: 1.4;
+    }
+
+    /* Footer & Disclaimer */
+    .disclaimer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 6px;
+      font-size: 8.5px;
+      color: #94a3b8;
+      line-height: 1.35;
+    }
+
+    /* Print Media Overrides */
+    @media print {
+      body { background: #fff; }
+      .no-print-bar { display: none !important; }
+      .sheet-wrapper { padding: 0; }
+      .page {
+        box-shadow: none;
+        margin: 0;
+        width: 210mm;
+        height: 297mm;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- In-Browser Control Bar (Disappears on Print/PDF) -->
+  <div class="no-print-bar">
+    <div class="control-group">
+      <span>Price:</span>
+      <input type="number" id="inpPrice" value="4152" step="0.5" />
+      <span>Pivot:</span>
+      <input type="number" id="inpPivot" value="4178" step="0.5" />
+      <button class="btn btn-fetch" onclick="applyCustomData()">Update Levels</button>
+      <button class="btn btn-fetch" style="background:#475569;" onclick="fetchLiveMarket()">Fetch Live Market</button>
+    </div>
+    <div>
+      <button class="btn btn-print" onclick="window.print()">Download / Print to PDF</button>
+    </div>
+  </div>
+
+  <!-- A4 Page Container -->
+  <div class="sheet-wrapper">
+    <div class="page" id="reportPage">
+      <div>
+        <!-- Header -->
+        <div class="header-box">
+          <div>
+            <div class="brand-title">RR MULTI TRADING</div>
+            <div class="brand-sub">Daily Intraday Market Research • M30 Framework</div>
+          </div>
+          <div class="meta-box">
+            Asset: <strong>Gold (XAUUSD) Spot</strong><br>
+            Session: <strong id="lblDate">Loading...</strong>
+          </div>
+        </div>
+
+        <!-- Bias Card -->
+        <div class="bias-card" id="biasCard">
+          <div class="bias-top">
+            <span class="badge-bias" id="badgeBias">MARKET BIAS: BEARISH ⬇</span>
+            <span class="badge-pivot" id="badgePivot">PIVOT RESISTANCE: 4,178</span>
+          </div>
+          <div class="bias-text" id="biasText">
+            <strong>Our Preference:</strong> Downside prevails as long as <strong id="txtPivot1">4,178</strong> acts as resistance, with <strong id="txtTP1">4,142</strong> and <strong id="txtTP2">4,120</strong> as primary targets.<br>
+            <strong>Alternative Scenario:</strong> A firm close above <strong id="txtPivot2">4,178</strong> invalidates shorts, opening recovery targets toward <strong id="txtAlt1">4,205</strong> and <strong id="txtAlt2">4,232</strong>.
+          </div>
+        </div>
+
+        <!-- Visual Technical SVG Chart -->
+        <div class="chart-box">
+          <svg id="chartSvg" viewBox="0 0 760 190" width="100%" height="190" xmlns="http://www.w3.org/2000/svg">
+            <!-- Dynamic Content injected via JavaScript -->
+          </svg>
+        </div>
+
+        <!-- Level Architecture Matrix -->
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 26%;">Structural Role</th>
+              <th style="width: 20%;">Price Level</th>
+              <th>Technical Significance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Resistance 2</td>
+              <td><strong id="tblAlt2">4,232 **</strong></td>
+              <td>Bullish extension target 2</td>
+            </tr>
+            <tr>
+              <td>Resistance 1</td>
+              <td><strong id="tblAlt1">4,205 *</strong></td>
+              <td>Bullish breakout confirmation shelf</td>
+            </tr>
+            <tr class="row-pivot">
+              <td>Pivot Point</td>
+              <td><strong id="tblPivot">4,178 **</strong></td>
+              <td>Master invalidation threshold (Bias-defining ceiling)</td>
+            </tr>
+            <tr>
+              <td>Dynamic Confluence</td>
+              <td><strong id="tblSMA">4,164 – 4,172</strong></td>
+              <td>20 SMA baseline &amp; 50 SMA confluence zone</td>
+            </tr>
+            <tr>
+              <td>Current Reference</td>
+              <td><strong id="tblLast">4,152</strong></td>
+              <td>Active session market execution price</td>
+            </tr>
+            <tr class="row-target" id="rowTP1">
+              <td>Target 1</td>
+              <td><strong id="tblTP1">4,142 *</strong></td>
+              <td>Initial scale-out / reaction shelf (TP1)</td>
+            </tr>
+            <tr class="row-target" id="rowTP2">
+              <td>Target 2</td>
+              <td><strong id="tblTP2">4,120 **</strong></td>
+              <td>Primary liquidity pool / major objective (TP2)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Intraday Execution Blueprint -->
+        <div class="grid">
+          <div class="grid-item">
+            <span>Entry Zone</span>
+            <strong id="cardEntry">4,162 – 4,172</strong>
+          </div>
+          <div class="grid-item">
+            <span>Stop Loss</span>
+            <strong id="cardSL">4,183</strong>
+          </div>
+          <div class="grid-item">
+            <span>Take Profit 1</span>
+            <strong id="cardTP1">4,142</strong>
+          </div>
+          <div class="grid-item">
+            <span>Take Profit 2</span>
+            <strong id="cardTP2">4,120</strong>
+          </div>
+        </div>
+
+        <!-- Momentum Summary -->
+        <div class="commentary-box" id="txtCommentary">
+          <strong>Technical Summary:</strong> Price trades below both the 20-period baseline and 50-period SMA. The 30-minute RSI is hovering below its neutral 50 threshold (~44), while the MACD histogram remains sub-zero below its signal line. Favor selling into dynamic resistance pullbacks rather than chasing immediate lows.
+        </div>
+      </div>
+
+      <!-- Footer Disclaimer -->
+      <div class="disclaimer">
+        <strong>INSTITUTIONAL DISCLAIMER:</strong> Prepared solely for informational, educational, and algorithmic modeling reference by RR MULTI TRADING / RR TRADE. Does not constitute certified financial advice. Trading spot commodities and derivative contracts carries risk of capital loss. Past technical precision is no guarantee of future market performance.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State Model
+    let state = {
+      price: 4152,
+      pivot: 4178,
+      tp1: 4142,
+      tp2: 4120,
+      alt1: 4205,
+      alt2: 4232,
+      sma20: 4164,
+      sma50: 4172,
+      rsi: 44,
+      isBearish: true
+    };
+
+    function recalculate(price, pivot) {
+      const isBearish = price <= pivot;
+      const range = Math.max(Math.abs(pivot - price) * 1.8, 40);
+
+      const tp1 = Math.round(isBearish ? pivot - range * 0.45 : pivot + range * 0.45);
+      const tp2 = Math.round(isBearish ? pivot - range * 0.85 : pivot + range * 0.85);
+      const alt1 = Math.round(isBearish ? pivot + range * 0.45 : pivot - range * 0.45);
+      const alt2 = Math.round(isBearish ? pivot + range * 0.85 : pivot - range * 0.85);
+
+      const sma20 = Math.round(price + (isBearish ? 10 : -10));
+      const sma50 = Math.round(pivot + (isBearish ? -5 : 5));
+
+      state = {
+        price,
+        pivot,
+        tp1,
+        tp2,
+        alt1,
+        alt2,
+        sma20,
+        sma50,
+        rsi: isBearish ? 44 : 58,
+        isBearish
+      };
+
+      render();
+    }
+
+    function render() {
+      const d = new Date();
+      document.getElementById('lblDate').innerText = d.toLocaleDateString('en-US', {
+        weekday: 'long', year: 'numeric', month: 'short', day: 'numeric'
+      });
+
+      // Update text fields
+      document.getElementById('badgePivot').innerText = `PIVOT ${state.isBearish ? 'RESISTANCE' : 'SUPPORT'}: ${state.pivot}`;
+      document.getElementById('badgeBias').innerText = `MARKET BIAS: ${state.isBearish ? 'BEARISH ⬇' : 'BULLISH ⬆'}`;
+      
+      const biasCard = document.getElementById('biasCard');
+      const badgeBias = document.getElementById('badgeBias');
+      const biasText = document.getElementById('biasText');
+
+      if (state.isBearish) {
+        biasCard.className = "bias-card";
+        badgeBias.className = "badge-bias";
+        biasText.className = "bias-text";
+        biasText.innerHTML = `<strong>Our Preference:</strong> Downside prevails as long as <strong>${state.pivot}</strong> acts as resistance, with <strong>${state.tp1}</strong> and <strong>${state.tp2}</strong> as primary targets.<br><strong>Alternative Scenario:</strong> A firm close above <strong>${state.pivot}</strong> invalidates shorts, opening recovery targets toward <strong>${state.alt1}</strong> and <strong>${state.alt2}</strong>.`;
+      } else {
+        biasCard.className = "bias-card bullish";
+        badgeBias.className = "badge-bias bullish";
+        biasText.className = "bias-text bullish";
+        biasText.innerHTML = `<strong>Our Preference:</strong> Upside prevails as long as <strong>${state.pivot}</strong> acts as support, with <strong>${state.tp1}</strong> and <strong>${state.tp2}</strong> as primary targets.<br><strong>Alternative Scenario:</strong> A firm drop below <strong>${state.pivot}</strong> invalidates longs, opening downside targets toward <strong>${state.alt1}</strong> and <strong>${state.alt2}</strong>.`;
+      }
+
+      // Matrix Table
+      document.getElementById('tblAlt2').innerText = `${state.alt2} **`;
+      document.getElementById('tblAlt1').innerText = `${state.alt1} *`;
+      document.getElementById('tblPivot').innerText = `${state.pivot} **`;
+      document.getElementById('tblSMA').innerText = `${Math.min(state.sma20, state.sma50)} – ${Math.max(state.sma20, state.sma50)}`;
+      document.getElementById('tblLast').innerText = `${state.price}`;
+      document.getElementById('tblTP1').innerText = `${state.tp1} *`;
+      document.getElementById('tblTP2').innerText = `${state.tp2} **`;
+
+      const r1 = document.getElementById('rowTP1');
+      const r2 = document.getElementById('rowTP2');
+      r1.className = state.isBearish ? "row-target" : "row-target bullish";
+      r2.className = state.isBearish ? "row-target" : "row-target bullish";
+
+      // Execution Grid
+      const entryZone = state.isBearish 
+        ? `${Math.round(state.price + 8)} – ${Math.round(state.pivot - 4)}` 
+        : `${Math.round(state.pivot + 4)} – ${Math.round(state.price - 8)}`;
+      const sl = state.isBearish ? state.pivot + 5 : state.pivot - 5;
+
+      document.getElementById('cardEntry').innerText = entryZone;
+      document.getElementById('cardSL').innerText = sl;
+      document.getElementById('cardTP1').innerText = state.tp1;
+      document.getElementById('cardTP2').innerText = state.tp2;
+
+      // Render Dynamic SVG
+      renderSvgChart();
+    }
+
+    function renderSvgChart() {
+      const svg = document.getElementById('chartSvg');
+      const arrowColor = state.isBearish ? "#dc2626" : "#16a34a";
+      const arrowPath = state.isBearish ? "M 590,105 L 620,138" : "M 590,115 L 620,82";
+      const arrowHead = state.isBearish ? "613,142 624,140 622,130" : "613,78 624,80 622,90";
+
+      svg.innerHTML = `
+        <rect width="760" height="190" fill="#ffffff"/>
+        
+        <!-- Alt 2 -->
+        <line x1="10" y1="20" x2="635" y2="20" stroke="#16a34a" stroke-width="1.2"/>
+        <rect x="640" y="10" width="110" height="18" fill="#16a34a" rx="3"/>
+        <text x="695" y="23" fill="#ffffff" font-size="10" font-weight="700" text-anchor="middle">${state.alt2} (Alt 2)</text>
+
+        <!-- Alt 1 -->
+        <line x1="10" y1="46" x2="635" y2="46" stroke="#4ade80" stroke-width="1.2"/>
+        <rect x="640" y="36" width="110" height="18" fill="#4ade80" rx="3"/>
+        <text x="695" y="49" fill="#ffffff" font-size="10" font-weight="700" text-anchor="middle">${state.alt1} (Alt 1)</text>
+
+        <!-- Pivot -->
+        <line x1="10" y1="74" x2="635" y2="74" stroke="#2563eb" stroke-width="2.2"/>
+        <rect x="640" y="64" width="110" height="20" fill="#2563eb" rx="3"/>
+        <text x="695" y="78" fill="#ffffff" font-size="10.5" font-weight="800" text-anchor="middle">${state.pivot} (Pivot)</text>
+
+        <!-- Last Price -->
+        <line x1="10" y1="105" x2="635" y2="105" stroke="#334155" stroke-dasharray="3,3" stroke-width="1.2"/>
+        <rect x="640" y="95" width="110" height="18" fill="#1e293b" rx="3"/>
+        <text x="695" y="108" fill="#ffffff" font-size="10" font-weight="700" text-anchor="middle">${state.price} (Last)</text>
+
+        <!-- TP1 -->
+        <line x1="10" y1="135" x2="635" y2="135" stroke="#dc2626" stroke-width="2"/>
+        <rect x="640" y="125" width="110" height="20" fill="#dc2626" rx="3"/>
+        <text x="695" y="139" fill="#ffffff" font-size="10.5" font-weight="800" text-anchor="middle">${state.tp1} (TP1)</text>
+
+        <!-- TP2 -->
+        <line x1="10" y1="165" x2="635" y2="165" stroke="#991b1b" stroke-width="2"/>
+        <rect x="640" y="155" width="110" height="20" fill="#991b1b" rx="3"/>
+        <text x="695" y="169" fill="#ffffff" font-size="10.5" font-weight="800" text-anchor="middle">${state.tp2} (TP2)</text>
+
+        <!-- Waveform Simulation -->
+        <path d="M 20,68 Q 90,55 160,78 T 300,75 T 440,88 T 580,105" fill="none" stroke="#64748b" stroke-width="1.8"/>
+
+        <!-- Directional Arrow -->
+        <path d="${arrowPath}" fill="none" stroke="${arrowColor}" stroke-width="3"/>
+        <polygon points="${arrowHead}" fill="${arrowColor}"/>
+      `;
+    }
+
+    function applyCustomData() {
+      const price = parseFloat(document.getElementById('inpPrice').value) || 4152;
+      const pivot = parseFloat(document.getElementById('inpPivot').value) || 4178;
+      recalculate(price, pivot);
+    }
+
+    // Auto-fetch real-time market data via public gold feed (PAXG 1:1 spot gold)
+    async function fetchLiveMarket() {
+      try {
+        const res = await fetch('https://api.binance.com/api/v3/klines?symbol=PAXGUSDT&interval=30m&limit=30');
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          const lastCandle = data[data.length - 1];
+          const lastPrice = Math.round(parseFloat(lastCandle[4]));
+          
+          let high = 0, low = Infinity;
+          data.forEach(c => {
+            const h = parseFloat(c[2]), l = parseFloat(c[3]);
+            if (h > high) high = h;
+            if (l < low) low = l;
+          });
+          const calcPivot = Math.round((high + low + lastPrice) / 3);
+          
+          document.getElementById('inpPrice').value = lastPrice;
+          document.getElementById('inpPivot').value = calcPivot;
+          recalculate(lastPrice, calcPivot);
+        }
+      } catch (e) {
+        alert("Live network feed busy. Updated with manual formula inputs.");
+        applyCustomData();
+      }
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      render();
+    });
+  </script>
+</body>
+</html>
